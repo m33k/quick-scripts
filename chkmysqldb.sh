@@ -7,4 +7,21 @@
 # Start of Script
 
 # Variable Declarations:
+WORKDIR=/home/.hd/ticket/
+TICKETDIR=/home/.hd/ticket/$TICKETID
+# Ask User for Ticket ID
+read "Please enter ticket id: " TICKETID
 
+# Checking and Creating Directories
+if [ ! -d "$WORKDIR" ]; then
+ echo "....creating HD working directory"
+ mkdir -pv $WORKDIR;
+ chmod 600 $WORKDIR;
+fi
+
+if [ ! -d "$TICKETDIR" ]; then
+ mkdir -pv $TICKETDIR;
+fi 
+
+# Check and Repair MySQL Databases
+# 
