@@ -10,6 +10,7 @@
 # Variable Declarations:
 WORKDIR=/home/.hd/ticket/
 TICKETDIR=/home/.hd/ticket/$TICKETID
+SCREENID=ticket.$TICKETID
 
 # Ask User for Ticket ID
 read "Please enter ticket id: " TICKETID
@@ -27,11 +28,18 @@ if [ ! -d "$TICKETDIR" ]; then
 fi 
 
 # Check and Repair MySQL Databases
+if ! screen -list | grep -q "$SCREENID"; 
+then
 
-echo ".....Running Checks and Repairs on MYISAM Tables"
-nice -19 find /var/lib/mysql/ -type f -name '*.MYI' | xargs nice -19 myisamchk -r | tee -a /home/.hd/ticket/$TICKETID/myisamchk.$(date +%b%d-%H.%M).log
+ echo ".....Running Checks and Repairs on MYISAM Tables"
+ nice -19 find /var/lib/mysql/ -type f -name '*.MYI' | xargs nice -19 myisamchk -r | tee -a /home/.hd/ticket/$TICKETID/myisamchk.$(date +%b%d-%H.%M).log
 
-echo ".....Running Checks and Repairs on InnoDB Tables"
-nice -19 mysqlcheck -A --auto-repair | tee -a /home/.hd/ticket/$TICKETID/mysqlchk.$(date +%b%d-%H.%M).log
- 
-echo "Checks and Repairs Completed! Please check logs for more details."
+ echo ".....Running Checks and Repairs on InnoDB Tables"
+ nice -19 mysqlcheck -A --auto-repair | tee -a /home/.hd/ticket/$TICKETID/mysqlchk.$(date +%b%d-%H.%M).log
+ echo "Checks and Repairs Completed! Please check logs for more details."
+
+else 
+
+ echo "No Screen Detected! Please run this script in screen. Exiting Program..."
+ exit 0
+fi
