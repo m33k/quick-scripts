@@ -13,7 +13,7 @@ TICKETDIR=/home/.hd/ticket/$TICKETID
 SCREENID=ticket.$TICKETID
 
 # Ask User for Ticket ID
-read "Please enter ticket id: " TICKETID
+read -p "Please enter ticket id: " TICKETID
 
 # Checking and Creating Directories
 if [ ! -d "$WORKDIR" ]; then
