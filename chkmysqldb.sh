@@ -23,7 +23,7 @@ if [ ! -d "$WORKDIR" ]; then
 fi
 
 if [ ! -d "$TICKETDIR" ]; then
- echo ".... creating working directory for ticket: $TICKETID
+ echo ".... creating working directory for ticket: "$TICKETID
  mkdir -pv $TICKETDIR;
 fi 
 
