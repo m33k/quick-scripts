@@ -28,8 +28,8 @@ if [ ! -d "$TICKETDIR" ]; then
  mkdir -pv $TICKETDIR;
 fi 
 
-# Check and Repair MySQL Databases
-if ! screen -list | grep -q "$SCREENID"; 
+# Check if screen is running in screen and Repair MySQL Databases
+if  screen -list | grep -q "$SCREENID"; 
 then
 
  echo ".....Running Checks and Repairs on MYISAM Tables"
