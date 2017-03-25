@@ -9,7 +9,6 @@
 
 # Variable Declarations:
 WORKDIR=/home/.hd/ticket/
-TICKETDIR=/home/.hd/ticket/$TICKETID
 SCREENID=ticket.$TICKETID
 
 # Ask User for Ticket ID
@@ -21,6 +20,8 @@ if [ ! -d "$WORKDIR" ]; then
  mkdir -pv $WORKDIR;
  chmod 600 $WORKDIR;
 fi
+
+TICKETDIR=/home/.hd/ticket/$TICKETID # Declaring TICKETDIR variable here to fit the logic of the script.
 
 if [ ! -d "$TICKETDIR" ]; then
  echo ".... creating working directory for ticket: "$TICKETID
