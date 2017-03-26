@@ -8,7 +8,7 @@
 
 # Variable Declarations
 auditOff=`systemctl status auditd | grep -i dead | awk '{print $3}'`
-auditFailed=`systemctl status auditd | head -3 | grep failed | awk {'print     $2'}`
+auditFailed=`systemctl status auditd | head -3 | grep failed | awk {'print $2'}`
 
 # Check if Audit is installed
 
@@ -19,8 +19,9 @@ exit 1;
 
 if [ "$auditOff" == "(dead)" ]; then
   echo "auditd is not running."
+  exit 0;
 
 elif [ "$auditFailed" == failed ]; then
-  echo "auditd failed! Please Check Logs."
-
+  echo "auditd has failed! Please Check Logs."
+  exit 1;
 fi
