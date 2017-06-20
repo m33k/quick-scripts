@@ -25,3 +25,5 @@ elif [ "$auditFailed" == failed ]; then
   echo "auditd has failed! Please Check Logs."
   exit 1;
 fi
+
+# End of Script
