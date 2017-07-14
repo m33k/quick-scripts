@@ -18,16 +18,40 @@
 # script could also notify level2 if backups are still running after 12-16 hours
 # Title could be like: [server.ondine.net.co] FAILED ⛔: httpd (198.136.49.170)
 # use ansible to deploy the script
+
+
+# Part 1 of Backups Monitor
+
+
 CRITICALDISKUSAGE="85" 
 BACKUPDISKUSAGE=$(df -Ph | grep "/backup" | awk '{print $5}' | cut -d% -f1)
 
 if [ $BACKUPDISKUSAGE -gt $CRITICALDISKUSAGE ]; then
-echo "Test Email" | mail -n -s "Sending Test eMail" root
+echo "Team, the backups drive on $HOSTNAME has reached a critical level. Please investigate." | mail -n -s "[ALERT] Backup Drive on $HOSTNAME" root
 fi
 
+
+
+# Part 2 of Backups Monitor
+
 # Backups running on system
-BACKUPPROC="ps -elF | grep cpanel/bin/backup | grep -v grep | wc -l"
-# If backup is still running
+BACKUPPROC=$(ps -elF | grep cpanel/bin/backup | grep -v grep | wc -l)
+# If backup is still running alert level2 and tell them backups have been running for this many hours.
+# idea: check the head of backup log and capture the time backups started. Get current time and do some math and print how long backups have been running. 
+# now if backups have been running for over x (7) hours, alert level2
+
+
+
+
+# Part 3 of Backups Monitor
+# tail latest backup log and if backup log matches PartialFailure string send alert to level2 so they can look into it.
+# Need to find a way to say this: check latest backup log for this string and if it mataches send failure email
+BACKUPFAIL="Backup::PartialFailure"
+BACKUPFINALSTATUS=""
+LATESTBACKUPLOG=$(ls -Art /usr/local/cpanel/logs/cpbackup/ | tail -n 1)
+if [ $BACKUPFINALSTATUS == $BACKUPFAIL ] ; then
+  echo "Team, the backups drive on $HOSTNAME has reached a critical level. Please investigate." | mail -n -s "[ALERT] Backups Failed on $HOSTNAME" root
+fi
 
 # Sample of cpanel backups failing
 #[2017-07-13 05:54:40 -0400] info [backup] Queuing transport of file: /backup/2017-07-13/backup_incomplete
