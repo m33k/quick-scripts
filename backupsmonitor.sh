@@ -43,17 +43,22 @@ BACKUPPROC=$(ps -elF | grep cpanel/bin/backup | grep -v grep | wc -l)
 
 
 
-# Part 3 of Backups Monitor
+# Part 3 of Backups Monitor (Partial & Full Failure)
 # tail latest backup log and if backup log matches PartialFailure string send alert to level2 so they can look into it.
 # Need to find a way to say this: check latest backup log for this string and if it mataches send failure email
-BACKUPFAIL="Backup::PartialFailure"
-BACKUPFINALSTATUS=""
+BACKUPPARTFAIL="Backup::PartialFailure"
+BACKUPFAIL="Backup::Failure"
+BACKUPFINALSTATUS=$(perl -lne 'print $1 if /Final state is (.*)/' /usr/local/cpanel/logs/cpbackup/$LATESTBACKUPLOG | cut -d'(' -f1)
 LATESTBACKUPLOG=$(ls -Art /usr/local/cpanel/logs/cpbackup/ | tail -n 1)
-if [ $BACKUPFINALSTATUS == $BACKUPFAIL ] ; then
-  echo "Team, the backups drive on $HOSTNAME has reached a critical level. Please investigate." | mail -n -s "[ALERT] Backups Failed on $HOSTNAME" root
+if [ $BACKUPFINALSTATUS == $BACKUPPARTFAIL ] ; then
+  echo "Team, the backups on $HOSTNAME have completed with a partial failure. Please investigate." | mail -n -s "[ALERT] Backups Partially Failed on $HOSTNAME" root
 fi
 
-# Sample of cpanel backups failing
+if [ $BACKUPFINALSTATUS == $BACKUPFAIL ] ; then
+  echo "Team, the backups on $HOSTNAME have completed with a full failure. Please investigate." | mail -n -s "[CRITICAL] Backups Failed on $HOSTNAME" root
+fi
+
+# Sample of cpanel backups partial failing
 #[2017-07-13 05:54:40 -0400] info [backup] Queuing transport of file: /backup/2017-07-13/backup_incomplete
 #[2017-07-13 05:54:40 -0400] info [backup] Pruning backup directory: /backup/2017-07-13
 #[2017-07-13 06:52:53 -0400] info [backup] Queuing prune operation for remote destination daily backups
@@ -61,3 +66,6 @@ fi
 #[2017-07-13 06:53:23 -0400] info [backup] Completed at Thu Jul 13 06:53:23 2017
 #[2017-07-13 06:53:23 -0400] info [backup] Final state is Backup::PartialFailure (0)
 #[2017-07-13 06:53:23 -0400] info [backup] Sent Backup::PartialFailure notification.
+
+# Full backups failure
+# [2015-10-16 02:00:02 -0300] info [Autodie] Final state is Backup::Failure (0)
