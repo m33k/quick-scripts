@@ -46,16 +46,19 @@ BACKUPPROC=$(ps -elF | grep cpanel/bin/backup | grep -v grep | wc -l)
 # Part 3 of Backups Monitor (Partial & Full Failure)
 # tail latest backup log and if backup log matches PartialFailure string send alert to level2 so they can look into it.
 # Need to find a way to say this: check latest backup log for this string and if it mataches send failure email
+# Need to add a tail of the last 10 lines of backup log.
+# It would be nice if it could tell us when the backup started too and how long it took.
+# If backups are still running then part three should not run.
 BACKUPPARTFAIL="Backup::PartialFailure"
 BACKUPFAIL="Backup::Failure"
 BACKUPFINALSTATUS=$(perl -lne 'print $1 if /Final state is (.*)/' /usr/local/cpanel/logs/cpbackup/$LATESTBACKUPLOG | cut -d'(' -f1)
 LATESTBACKUPLOG=$(ls -Art /usr/local/cpanel/logs/cpbackup/ | tail -n 1)
 if [ $BACKUPFINALSTATUS == $BACKUPPARTFAIL ] ; then
-  echo "Team, the backups on $HOSTNAME have completed with a partial failure. Please investigate." | mail -n -s "[ALERT] Backups Partially Failed on $HOSTNAME" root
+  echo -e "Team, the backups on $HOSTNAME have completed with a partial failure. Please investigate.\n `tail -n 5 $LATESTBACKUPLOG`" | mail -n -s "[ALERT] Backups Partially Failed on $HOSTNAME" root
 fi
 
 if [ $BACKUPFINALSTATUS == $BACKUPFAIL ] ; then
-  echo "Team, the backups on $HOSTNAME have completed with a full failure. Please investigate." | mail -n -s "[CRITICAL] Backups Failed on $HOSTNAME" root
+  echo -e "Team, the backups on $HOSTNAME have completed with a full failure. Please investigate. \n `tail -n 5 $LATESTBACKUPLOG`" | mail -n -s "[CRITICAL] Backups Failed on $HOSTNAME" root
 fi
 
 # Sample of cpanel backups partial failing
