@@ -22,7 +22,6 @@
 
 # Part 1 of Backups Monitor
 
-
 CRITICALDISKUSAGE="85" 
 BACKUPDISKUSAGE=$(df -Ph | grep "/backup" | awk '{print $5}' | cut -d% -f1)
 
@@ -36,14 +35,22 @@ fi
 
 # Backups running on system
 BACKUPPROC=$(ps -elF | grep cpanel/bin/backup | grep -v grep | wc -l)
+CPANELUSERS=$(ls -1 /var/cpanel/users | grep -Ev './|system' | wc -l)
+LATESTBACKUPLOG=$(ls -Art /usr/local/cpanel/logs/cpbackup/ | tail -n 1)
+BACKUPSTARTTIME=$(head -1 /usr/local/cpanel/logs/cpbackup/$LATESTBACKUPLOG.log | awk {'print $2'})
+CURRENTTIME=$()
 # If backup is still running alert level2 and tell them backups have been running for this many hours.
 # idea: check the head of backup log and capture the time backups started. Get current time and do some math and print how long backups have been running. 
 # now if backups have been running for over x (7) hours, alert level2
+# Include details about how many users are on the server and how many are enabled for backups.
+# Also alert us if cpanel is using legacy backups. This may be the file. -- /etc/cpbackup.conf
+LEGACYBACKUPSTATUS=$(grep BACKUPENABLE /etc/cpbackup.conf | cut -d ' ' -f2)
 
-
-
+if [ $LEGACYBACKUPSTATUS == "yes" ]; then
+echo "Team, the leagacy backups is enabled on $HOSTNAME . Please investigate." | mail -n -s "[ALERT] Legacy Backups Enabled on $HOSTNAME" root
 
 # Part 3 of Backups Monitor (Partial & Full Failure)
+
 # tail latest backup log and if backup log matches PartialFailure string send alert to level2 so they can look into it.
 # Need to find a way to say this: check latest backup log for this string and if it mataches send failure email
 # Need to add a tail of the last 10 lines of backup log.
@@ -72,3 +79,4 @@ fi
 
 # Full backups failure
 # [2015-10-16 02:00:02 -0300] info [Autodie] Final state is Backup::Failure (0)
+
