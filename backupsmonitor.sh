@@ -39,6 +39,7 @@ CPANELUSERS=$(ls -1 /var/cpanel/users | grep -Ev './|system' | wc -l)
 LATESTBACKUPLOG=$(ls -Art /usr/local/cpanel/logs/cpbackup/ | tail -n 1)
 BACKUPSTARTTIME=$(head -1 /usr/local/cpanel/logs/cpbackup/$LATESTBACKUPLOG.log | awk {'print $2'})
 CURRENTTIME=$()
+BACKUPRUNTIME=$(ps -p$BACKUPPID -o etime | sed 1d | awk {'print $1'})
 # If backup is still running alert level2 and tell them backups have been running for this many hours.
 # idea: check the head of backup log and capture the time backups started. Get current time and do some math and print how long backups have been running. 
 # now if backups have been running for over x (7) hours, alert level2
