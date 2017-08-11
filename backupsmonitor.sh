@@ -45,6 +45,7 @@ BACKUPRUNTIME=$(ps -p$BACKUPPID -o etime | sed 1d | awk {'print $1'})
 # now if backups have been running for over x (7) hours, alert level2
 # Include details about how many users are on the server and how many are enabled for backups.
 # Also alert us if cpanel is using legacy backups. This may be the file. -- /etc/cpbackup.conf
+# If backups are running for x amount of time alert level 2 and tell them about the environment (hostname, ip, how many accounts, os & cpanel version, cpu & mem)
 LEGACYBACKUPSTATUS=$(grep BACKUPENABLE /etc/cpbackup.conf | cut -d ' ' -f2)
 
 if [ $LEGACYBACKUPSTATUS == "yes" ]; then
