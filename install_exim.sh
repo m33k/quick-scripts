@@ -10,6 +10,19 @@ BACKUPDIR="/home/.backup/original"
 
 #read -p "Please enter ticket number" $FQDN
 
+OS=$(cat /etc/redhat-release | cut -d. -f1 | sed s'/Linux release //')
+
+if [[ $OS =~ ^CentOS* ]]; then
+  echo "Installing exim in 3 seconds."
+  sleep 3
+else
+  echo -e "\e[31m!!!! This server is not running CentOS!!!\e[0m"
+  echo ""
+  echo -e "\e[33mThis script is only compatiable with CentOS.\e[0m"
+  exit 1;
+fi
+
+
 # EPEL Repo Added and OS Update
 
 yum install epel-release -y
