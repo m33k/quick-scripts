@@ -1,0 +1,54 @@
+#!/bin/bash
+# Name: local_exec
+# Date: 2018-07-23
+# Description: Creates local directories used for compiling when you're not a root user.
+# Version: 0.1
+
+
+# Check if $HOME is set to a value > 0
+chk_home_env() {
+    if [ -z $HOME ]; then
+        echo -e "WARNING!!! No Directory Path Set In Home Environment Variable"
+        exit 1;
+    fi
+}
+
+# Create dirs function
+create_dirs() {
+    mkdir -p $HOME/.local/bin # Local binaries
+    mkdir -p $HOME/.local/etc # Host-specific system configuration for local binaries
+    mkdir -p $HOME/.local/games # Local game binaries
+    mkdir -p $HOME/.local/include # Local C header files
+    mkdir -p $HOME/.local/lib # Local libraries
+    mkdir -p $HOME/.local/lib64 # Local 64-bit libraries
+    mkdir -p $HOME/.local/man # Local online manuals
+    mkdir -p $HOME/.local/sbin # Local system binaries
+    mkdir -p $HOME/.local/share # Local architecture-independent hierarchy
+    mkdir -p $HOME/.local/src # Local source code
+}
+
+# Ask user to create dirs using create_dirs function
+
+shall_i_do_the_needful() {
+    echo -e "Hello $USER, shall I do the needful?"
+    read -p -t 30 ANSWER
+    if [ $ANSWER == "yes" ]; then
+        echo -e "Creating directories as you wish"
+        create_dirs
+    elif [ $ANSWER = "no" ]; then
+        echo -e " Understood, sorry for bothering you"
+    fi
+}
+shall_i_do_the_needful
+
+# 
+create_man_symlink_centos() {
+OS=$(cat /etc/os-release  | grep CentOS | head -1 | sed 's/"//g' | cut -d = -f2)
+if [[ $OS == "CentOS Linux" ]]; then
+    ln -s $HOME/.local/share/man/ .local/man
+fi
+}
+create_man_symlink_centos
+
+# If compiling software from source, be sure
+# to run the ./configure with --prefix=$HOME/.local/
